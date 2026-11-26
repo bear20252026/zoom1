@@ -1,0 +1,10 @@
+# full-size originals and every intermediate: several gigabytes, and not needed to run the page
+masters/
+# the film's working files (the finished film, video/day-in-day-in.mp4, is kept)
+video/silent.mp4
+video/music.wav
+video/stills/
+.claude/
+__pycache__/
+*.pyc
+.DS_Store
