@@ -258,10 +258,14 @@ def main():
     wavfile.write(wav, SR, (out * 32767).astype(np.int16))
     print('wrote video/music.wav: %.1f s, peak %.2f, rms %.3f' % (len(out) / SR, np.abs(out).max(), np.sqrt((out ** 2).mean())))
     if len(sys.argv) > 1 and sys.argv[1] == 'film':
+        import tempfile
         silent, film = os.path.join(ROOT, 'video', 'silent.mp4'), os.path.join(ROOT, 'video', 'day-in-day-in.mp4')
-        subprocess.run([FFMPEG, '-y', '-loglevel', 'error', '-i', silent, '-i', wav, '-c:v', 'libx264', '-preset', 'slow',
-                        '-crf', '20', '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-b:a', '256k', '-shortest',
-                        '-movflags', '+faststart', film], check=True)
+        # two passes at a fixed size: about 75 MB for the lap (a repository will not take a file over 100 MB)
+        log = os.path.join(tempfile.mkdtemp(), 'pass')
+        video = ['-c:v', 'libx264', '-preset', 'slower', '-b:v', '5500k', '-pix_fmt', 'yuv420p', '-passlogfile', log]
+        subprocess.run([FFMPEG, '-y', '-loglevel', 'error', '-i', silent] + video + ['-pass', '1', '-an', '-f', 'null', os.devnull], check=True)
+        subprocess.run([FFMPEG, '-y', '-loglevel', 'error', '-i', silent, '-i', wav] + video +
+                       ['-pass', '2', '-c:a', 'aac', '-b:a', '256k', '-shortest', '-movflags', '+faststart', film], check=True)
         print('wrote video/day-in-day-in.mp4: %.1f MB' % (os.path.getsize(film) / 1e6))
 
 

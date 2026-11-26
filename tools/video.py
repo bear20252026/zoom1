@@ -13,13 +13,15 @@ on the first painting filling the frame, so it loops. tools/music.py writes the 
 import os
 import subprocess
 import sys
-from http.server import HTTPServer, SimpleHTTPRequestHandler
+import threading
+from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, urlparse
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, 'video')
 FFMPEG = os.environ.get('FFMPEG') or 'ffmpeg'
 state = {'ffmpeg': None, 'frames': 0, 'size': 0}
+lock = threading.Lock()       # one frame at a time into ffmpeg, whatever thread it arrives on
 
 
 class Handler(SimpleHTTPRequestHandler):
@@ -44,6 +46,10 @@ class Handler(SimpleHTTPRequestHandler):
     def do_POST(self):
         url = urlparse(self.path)
         data = self.rfile.read(int(self.headers.get('Content-Length') or 0))
+        with lock:
+            self.post(url, data)
+
+    def post(self, url, data):
         if url.path == '/start':
             q = parse_qs(url.query)
             w, h, fps = int(q['w'][0]), int(q['h'][0]), q.get('fps', ['30'])[0]
@@ -77,6 +83,10 @@ class Handler(SimpleHTTPRequestHandler):
             Image.frombytes('RGBA', (w, h), data).transpose(Image.FLIP_TOP_BOTTOM).convert('RGB').save(path)
             print('still: video/stills/%s.png' % name, flush=True)
             return self.reply(200, 'ok')
+        if url.path == '/fail':
+            q = parse_qs(url.query)
+            print('the page stopped at frame %s: %s' % (q.get('at', ['?'])[0], q.get('why', ['?'])[0]), flush=True)
+            return self.reply(200, 'ok')
         if url.path == '/done':
             if state['ffmpeg']:
                 state['ffmpeg'].stdin.close()
@@ -90,4 +100,7 @@ class Handler(SimpleHTTPRequestHandler):
 if __name__ == '__main__':
     port = int(sys.argv[1]) if len(sys.argv) > 1 else 7841
     print('serving %s on http://localhost:%d  (open /?capture=1080&record=1 to film)' % (ROOT, port), flush=True)
-    HTTPServer(('127.0.0.1', port), Handler).serve_forever()
+    # threaded: a browser parks idle connections on a server, and a one-at-a-time server waits on them for ever
+    server = ThreadingHTTPServer(('127.0.0.1', port), Handler)
+    server.daemon_threads = True
+    server.serve_forever()

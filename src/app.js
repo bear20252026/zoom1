@@ -175,6 +175,8 @@ if (!capture) requestAnimationFrame(frame);
 // ---- filming (capture mode only) --------------------------------------------------------------------------------
 const breathe = () => new Promise((r) => { const c = new MessageChannel(); c.port1.onmessage = r; c.port2.postMessage(0); });
 
+let film = null;
+
 // One frame of film: the walk at depth t (in paintings) and animation time c (seconds), as raw RGBA rows,
 // bottom row first. Waits until the three paintings in view are loaded at full size, so no frame is ever soft.
 async function shoot(t, c) {
@@ -191,9 +193,11 @@ async function shoot(t, c) {
   }
   for (const f of zoom.frames) if (f.state === 'ready') f.fade = 1;
   draw(0);
-  const px = new Uint8Array(cw * ch * 4);
-  gl.readPixels(0, 0, cw, ch, gl.RGBA, gl.UNSIGNED_BYTE, px);
-  return px;
+  // one buffer for every frame: a fresh 4.6 MB array each time outruns the garbage collector, and after a
+  // thousand-odd frames the browser runs out of memory
+  if (!film || film.length !== cw * ch * 4) film = new Uint8Array(cw * ch * 4);
+  gl.readPixels(0, 0, cw, ch, gl.RGBA, gl.UNSIGNED_BYTE, film);
+  return film;
 }
 
 // Film one whole lap and hand every frame to tools/video.py, which is serving this page.
@@ -208,6 +212,7 @@ async function record() {
       const px = await shoot(n / (pace * fps), n / fps);
       const res = await fetch('/frame', { method: 'POST', body: px });
       if (!res.ok) throw new Error(`frame ${n}: ${res.status}`);
+      await res.text();
       state.frame = n + 1;
       if (n % 30 === 0) document.title = `filming ${n}/${total}`;
     }
@@ -217,6 +222,7 @@ async function record() {
   } catch (err) {
     state.error = String(err);
     document.title = 'filming failed';
+    fetch(`/fail?at=${state.frame}&why=${encodeURIComponent(state.error)}`, { method: 'POST' }).catch(() => {});
   }
 }
 

@@ -211,12 +211,19 @@ STEPS = [
      "green, sage, mint and celadon, white ironwork, cream tiles, red as the accent."),
 
     ("glasshouse", "wider", WIDER +
-     "The whole inside of the great glasshouse is in view, under its arched glass roof and central dome of white "
-     "iron ribs, the open doors small in the middle of the far end. Tall palms reach the roof; a long rectangular "
-     "pool of aqua water with white water lilies, round lily pads and a few red fish runs down the middle toward "
-     "us, with a chequered cream and celadon path on each side; stone urns, a white heron, a bench; a few tiny "
-     "people strolling; pale sunlight slanting through the roof and falling in soft stripes." + WALKER +
-     " Palette: every green from mint to deep forest green, white ribs, aqua pool, cream paths, red fish."),
+     "The whole inside of the great glasshouse is in view, and it is perfectly symmetrical about the vertical "
+     "centre line of the image: the open doors are in the middle of the far end, the centre of the round glass "
+     "dome is directly above them on the same centre line, and a long rectangular lily pool runs straight toward "
+     "us along that centre line, its near end at the bottom edge of the image. The roof is an arched vault of "
+     "white iron ribs with the dome in the middle of it. The hanging basket in the central square hangs by its "
+     "chains from a white iron cross-beam just above the central square, not from the dome. The floor of "
+     "chequered cream and celadon tiles carries on outward from the central square with tiles of exactly the "
+     "same size, in the same perspective, so that the floor is one floor. Tall palms and tree ferns stand on "
+     "both sides, balanced left and right (palms and ferns only: no cypress or pine trees in here); stone urns "
+     "of pale pink and white flowers; a white heron; a bench; two or three tiny people standing. The pool has "
+     "aqua water with white water lilies, round lily pads and a few red fish. Pale sunlight slants through the "
+     "roof in soft stripes. Everything is still." + WALKER + " Palette: every green from mint to deep forest "
+     "green, white ribs, aqua pool, cream paths, red fish."),
 
     ("music door", "doorway", BACK +
      "We have stepped back through a tall doorway into a music room, and the glasshouse is seen through the open "

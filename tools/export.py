@@ -109,8 +109,14 @@ def do_ring():
     changed = 0
     for k, p in enumerate(pics):
         old = ring_path(k)
-        if os.path.exists(old) and np.array_equal(np.asarray(Image.open(old).convert('RGB')), np.asarray(p)):
-            continue                                             # unchanged: keep its file (and its upscale) as it is
+        if os.path.exists(old):
+            # Unchanged in its own ring? Then keep its file, and with it its upscale. What is in a painting's
+            # middle does not count: that is the next painting, and the export sets it in again afterwards.
+            was, now = np.asarray(Image.open(old).convert('RGB')).copy(), np.asarray(p).copy()
+            was[Q:Q + N, Q:Q + N] = 0
+            now[Q:Q + N, Q:Q + N] = 0
+            if np.array_equal(was, now):
+                continue
         p.save(old)
         changed += 1
     print('ring: %d drawings, %d written' % (COUNT, changed))

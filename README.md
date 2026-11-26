@@ -116,8 +116,10 @@ it. It begins and ends on the night garden filling the frame, so it loops.
 
 ```sh
 python3 tools/video.py                    # serves the site on :7841 and waits for frames
-#   then open http://localhost:7841/?capture=1080&record=1 in a browser -> video/silent.mp4
-python3 tools/music.py film               # video/music.wav, then video/day-in-day-in.mp4
+#   then, in another terminal (about a minute and a half; any browser with WebGL 2 will do, headless or not):
+"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new --use-angle=metal --enable-gpu \
+    --user-data-dir=/tmp/day-in-film "http://localhost:7841/?capture=1080&record=1"     # -> video/silent.mp4
+python3 tools/music.py film               # video/music.wav, then video/day-in-day-in.mp4 (two passes, about 75 MB)
 ```
 
 ### Making it again
