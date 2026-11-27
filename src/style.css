@@ -1,9 +1,8 @@
-/* Day In, Day In. One canvas, and for the first few seconds a torn piece of paper with the title on it. */
+/* Day In, Day In. One canvas, nothing else. */
 
 :root {
   --paper: #f6ecd2;
-  --ink: #d5402a;            /* vermilion, for the title */
-  --ink-soft: #1d5a43;       /* bottle green, for the rest */
+  --ink-soft: #1d5a43;       /* bottle green, for error notes */
   color-scheme: light;
 }
 
@@ -36,84 +35,8 @@ body {
 }
 #fall.dragging { cursor: grabbing; }
 
-/* ---- handwriting: every piece is an alpha mask, inked by its background colour ---- */
-.ink {
-  display: block;
-  margin: 0;
-  width: calc(var(--w) * var(--u) * var(--k, 1));
-  aspect-ratio: var(--w) / var(--h);
-  background: var(--ink);
-  -webkit-mask: var(--src) center / 100% 100% no-repeat;
-  mask: var(--src) center / 100% 100% no-repeat;
-  color: transparent;
-  font-size: 0;
-  overflow: hidden;
-  white-space: nowrap;
-}
-
-/* ---- the title, on torn paper; it lifts away when the fall begins ---- */
-#title {
-  position: fixed;
-  left: 50%;
-  top: 46%;
-  margin: 0;
-  --u: min(0.045vw, 0.075vh, 0.018rem);   /* one pixel of the handwriting sheet */
-  padding: calc(150 * var(--u)) calc(190 * var(--u)) calc(120 * var(--u));
-  display: grid;
-  justify-items: center;
-  gap: calc(52 * var(--u));
-  transform: translate(-50%, -50%) rotate(-1.6deg);
-  pointer-events: none;
-  filter: drop-shadow(0 0.1rem 0.05rem rgba(24, 22, 60, 0.28)) drop-shadow(0 0.5rem 0.9rem rgba(24, 22, 60, 0.22));
-  transition: transform 1.3s cubic-bezier(0.5, 0, 0.75, 0.3), opacity 0.9s ease 0.3s;
-}
-#title::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background: url("../art/ui/scrap_card.webp") center / 100% 100% no-repeat;
-}
-#title [data-ink="title"] { --k: 1.55; }
-#title [data-ink="sub"] { --k: 0.72; background: var(--ink-soft); }
-.hints {
-  margin: calc(46 * var(--u)) 0 0;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-  gap: calc(36 * var(--u)) calc(110 * var(--u));
-  --k: 0.56;
-  transition: opacity 0.6s ease;
-}
-.hints .ink { background: var(--ink-soft); }
-#wait {
-  position: absolute;
-  left: 0; right: 0;
-  bottom: calc(86 * var(--u));
-  margin: 0;
-  text-align: center;
-  font-style: italic;
-  font-size: max(0.72rem, calc(34 * var(--u)));
-  letter-spacing: 0.04em;
-  color: var(--ink-soft);
-  opacity: 0;
-  transition: opacity 0.4s ease;
-}
-#wait::after { content: " …"; }
-body.loading #wait { opacity: 0.85; }
-body.loading .hints { opacity: 0; }
-body.begun #title {
-  transform: translate(-50%, -260%) rotate(-7deg);
-  opacity: 0;
-}
-
 /* filming (?capture=...): the canvas alone, at its own size */
-body.capture #title { display: none; }
 body.capture #fall { inset: auto; left: 0; top: 0; }
 
 .plain { position: fixed; inset: auto 0 2rem; text-align: center; font-style: italic; }
 
-@media (prefers-reduced-motion: reduce) {
-  #title { transition-duration: 0.01s; }
-}

@@ -18,23 +18,22 @@ const N = STORY.frames.length;
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
 // ?capture=1080 turns the page into a camera for tools/video.py: a fixed square canvas at that many pixels, no
-// title card, and nothing drawn until a frame is asked for (mmm.shoot). Add &record=1 and it films itself.
+// title, and nothing drawn until a frame is asked for (mmm.shoot). Add &record=1 and it films itself.
 const query = new URLSearchParams(location.search);
 const capture = Number(query.get('capture')) || 0;
 if (capture) body.classList.add('capture');
 
-// ---- lettering (the title card is the only writing): give every piece its mask and its size ------------
-document.querySelectorAll('[data-ink]').forEach((el) => {
-  const piece = STORY.letters[el.dataset.ink];
-  if (!piece) return;
-  el.style.setProperty('--src', `url("../art/letters/${el.dataset.ink}.png")`);
-  el.style.setProperty('--w', piece.w);
-  el.style.setProperty('--h', piece.h);
-});
+// errors are the only writing: no title, no cards
+function say(msg) {
+  const p = document.createElement('p');
+  p.className = 'plain';
+  p.textContent = msg;
+  body.append(p);
+}
 
 const gl = canvas.getContext('webgl2', { antialias: false, alpha: false, powerPreference: 'high-performance' });
 if (!gl) {
-  $('#wait').textContent = 'this drawing needs WebGL 2, which this browser does not have';
+  say('this drawing needs WebGL 2, which this browser does not have');
   throw new Error('no WebGL2');
 }
 
@@ -71,7 +70,7 @@ let heading = 1;                      // which way it drifts when left alone: th
 let resting = still;                  // space bar (or reduced motion): no drift
 let begun = false;
 
-function begin() {                    // the title card lifts away
+function begin() {                    // the walk has started
   if (begun) return;
   begun = true;
   body.classList.add('begun');
@@ -168,7 +167,7 @@ if (!capture) requestAnimationFrame(frame);
     else if (capture && query.get('record')) record();
   } catch (err) {
     console.error(err);
-    $('#wait').textContent = 'the painting could not be fetched; try reloading';
+    say('the painting could not be fetched; try reloading');
   }
 })();
 
