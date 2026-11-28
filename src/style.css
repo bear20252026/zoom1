@@ -1,0 +1,42 @@
+/* Day In, Day In. One canvas, nothing else. */
+
+:root {
+  --paper: #f6ecd2;
+  --ink-soft: #1d5a43;       /* bottle green, for error notes */
+  color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: var(--paper);
+  overscroll-behavior: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font: 400 1rem/1.5 "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+#fall {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  cursor: default;
+  outline: none;
+}
+#fall.dragging { cursor: grabbing; }
+
+/* filming (?capture=...): the canvas alone, at its own size */
+body.capture #fall { inset: auto; left: 0; top: 0; }
+
+.plain { position: fixed; inset: auto 0 2rem; text-align: center; font-style: italic; }
+
